@@ -60,7 +60,7 @@ func GenerateBlsKey() (*PrivateKey, error) {
 	}
 
 	p := new(Fr)
-	p.SetLittleEndian(s.Bytes())
+	p.SetBigEndianMod(s.Bytes())
 
 	return &PrivateKey{p: p}, nil
 }

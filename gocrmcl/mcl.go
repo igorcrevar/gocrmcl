@@ -1184,9 +1184,12 @@ func GetUint64NumToPrecompute() int {
 }
 
 // PrecomputeG2 --
-func PrecomputeG2(Qbuf []uint64, Q *G2) {
+func PrecomputeG2(Q *G2) []uint64 {
+	Qbuf := make([]uint64, GetUint64NumToPrecompute())
 	// #nosec
 	C.mclBn_precomputeG2((*C.uint64_t)(unsafe.Pointer(&Qbuf[0])), Q.getPointer())
+
+	return Qbuf
 }
 
 // PrecomputedMillerLoop --

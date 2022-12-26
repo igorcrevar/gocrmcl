@@ -152,7 +152,10 @@ func TestSignature_Unmarshal(t *testing.T) {
 	sig2, err := UnmarshalSignature(bytes)
 	require.NoError(t, err)
 
-	assert.Equal(t, sig, sig2)
+	sig2Bytes, err := sig2.Marshal()
+	require.NoError(t, err)
+
+	assert.Equal(t, bytes, sig2Bytes)
 
 	_, err = UnmarshalSignature([]byte{})
 	assert.Error(t, err)

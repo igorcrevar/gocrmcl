@@ -40,13 +40,16 @@ func init() {
 		panic(fmt.Errorf("snark1 curve initialization error: %w", err))
 	}
 
-	qCoef = make([]uint64, GetUint64NumToPrecompute())
-	PrecomputeG2(qCoef, ellipticCurveG2)
+	qCoef = PrecomputeG2(ellipticCurveG2)
 }
 
 // Returns bls/bn254 domain
 func GetDomain() []byte {
 	return domain
+}
+
+func GetCoef() []uint64 {
+	return qCoef
 }
 
 // colects public keys from the BlsKeys

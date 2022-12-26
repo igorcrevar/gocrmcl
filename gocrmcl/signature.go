@@ -20,7 +20,7 @@ func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
 	e1, e2 := new(GT), new(GT)
 
 	G1Neg(messagePoint, messagePoint)
-	PrecomputedMillerLoop(e1, s.p, qCoef)
+	PrecomputedMillerLoop(e1, s.p, GetCoef())
 	MillerLoop(e2, messagePoint, publicKey.p)
 	GTMul(e1, e1, e2)
 	FinalExp(e1, e1)

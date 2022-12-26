@@ -22,7 +22,7 @@ func (p *PublicKey) aggregate(next *PublicKey) *PublicKey {
 			G2Add(newp, newp, p.p)
 		}
 	} else if next.p != nil {
-		G2Add(newp, newp, p.p)
+		G2Add(newp, newp, next.p)
 	}
 
 	return &PublicKey{p: newp}
