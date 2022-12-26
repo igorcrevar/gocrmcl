@@ -46,18 +46,14 @@ func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
 		return false
 	}
 
-	s1, gt1, gt2 := new(G1), new(GT), new(GT)
+	e1, e2 := new(GT), new(GT)
 
-	gt1.SetInt64(1)
-	G1Neg(s1, s.p)
-
-	MillerLoopVec(gt2, []G1{*messagePoint, *s1}, []G2{*publicKey.p, *ellipticCurveG2})
-	FinalExp(gt2, gt2)
-
-	// var one GT
-	// one.SetOne()
-	// return f.Equal(&one), nil
-	return gt1.IsEqual(gt2)
+	G1Neg(messagePoint, messagePoint)
+	PrecomputedMillerLoop(e1, s.p, qCoef)
+	MillerLoop(e2, messagePoint, publicKey.p)
+	GTMul(e1, e1, e2)
+	FinalExp(e1, e1)
+	return e1.IsOne()
 }
 
 // VerifyAggregated checks the BLS signature of the message against the aggregated public keys of its signers
