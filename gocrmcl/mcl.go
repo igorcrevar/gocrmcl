@@ -352,6 +352,21 @@ type Fp struct {
 	v C.mclBnFp
 }
 
+func newFp(a, b, c, d uint64) Fp {
+	fp := Fp{
+		v: C.mclBnFp{
+			d: [4]C.uint64_t{
+				C.uint64_t(a),
+				C.uint64_t(b),
+				C.uint64_t(c),
+				C.uint64_t(d),
+			},
+		},
+	}
+
+	return fp
+}
+
 // getPointer --
 func (x *Fp) getPointer() (p *C.mclBnFp) {
 	// #nosec
