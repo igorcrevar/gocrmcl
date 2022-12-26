@@ -48,10 +48,15 @@ func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
 
 	s1, gt1, gt2 := new(G1), new(GT), new(GT)
 
+	gt1.SetInt64(1)
 	G1Neg(s1, s.p)
-	Pairing(gt1, messagePoint, publicKey.p)
-	Pairing(gt2, s1, ellipticCurveG2)
 
+	MillerLoopVec(gt2, []G1{*messagePoint, *s1}, []G2{*publicKey.p, *ellipticCurveG2})
+	FinalExp(gt2, gt2)
+
+	// var one GT
+	// one.SetOne()
+	// return f.Equal(&one), nil
 	return gt1.IsEqual(gt2)
 }
 
