@@ -2,6 +2,7 @@ package gocrmcl
 
 import (
 	"encoding/hex"
+	"fmt"
 	"math/big"
 )
 
@@ -36,10 +37,10 @@ var (
 
 func init() {
 	if err := InitCurve(CurveSNARK1); err != nil {
-		panic(err)
+		panic(fmt.Errorf("snark1 curve initialization error: %w", err))
 	}
 
-	qCoef := make([]uint64, 256)
+	qCoef = make([]uint64, GetUint64NumToPrecompute())
 	PrecomputeG2(qCoef, ellipticCurveG2)
 }
 
