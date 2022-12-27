@@ -25,7 +25,7 @@ func CreateRandomBlsKeys(total int) ([]*PrivateKey, error) {
 // MarshalMessageToBigInt marshalls message into two big ints
 // first we must convert message bytes to point and than for each coordinate we create big int
 func MarshalMessageToBigInt(message []byte) ([2]*big.Int, error) {
-	g1, err := hashToG1(message)
+	g1, err := HashToG1(message)
 	if err != nil {
 		return [2]*big.Int{}, err
 	}
@@ -38,7 +38,8 @@ func MarshalMessageToBigInt(message []byte) ([2]*big.Int, error) {
 	}, nil
 }
 
-func hashToG1(message []byte) (*G1, error) {
+// Converts message to G1 point
+func HashToG1(message []byte) (*G1, error) {
 	if MapToModeSolidity {
 		hashRes, err := hashToFpXMDSHA256(message, GetDomain(), 2)
 		if err != nil {
@@ -67,6 +68,33 @@ func hashToG1(message []byte) (*G1, error) {
 	}
 
 	return g1, nil
+}
+
+// colects public keys from the BlsKeys
+func collectPublicKeys(keys []*PrivateKey) []*PublicKey {
+	pubKeys := make([]*PublicKey, len(keys))
+
+	for i, key := range keys {
+		pubKeys[i] = key.PublicKey()
+	}
+
+	return pubKeys
+}
+
+func padLeftOrTrim(bb []byte, size int) []byte {
+	l := len(bb)
+	if l == size {
+		return bb
+	}
+
+	if l > size {
+		return bb[l-size:]
+	}
+
+	tmp := make([]byte, size)
+	copy(tmp[size-l:], bb)
+
+	return tmp
 }
 
 func hashToFpXMDSHA256(msg []byte, domain []byte, count int) ([]*Fp, error) {

@@ -55,30 +55,3 @@ func GetDomain() []byte {
 func GetCoef() []uint64 {
 	return qCoef
 }
-
-// colects public keys from the BlsKeys
-func collectPublicKeys(keys []*PrivateKey) []*PublicKey {
-	pubKeys := make([]*PublicKey, len(keys))
-
-	for i, key := range keys {
-		pubKeys[i] = key.PublicKey()
-	}
-
-	return pubKeys
-}
-
-func PadLeftOrTrim(bb []byte, size int) []byte {
-	l := len(bb)
-	if l == size {
-		return bb
-	}
-
-	if l > size {
-		return bb[l-size:]
-	}
-
-	tmp := make([]byte, size)
-	copy(tmp[size-l:], bb)
-
-	return tmp
-}

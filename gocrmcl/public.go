@@ -97,10 +97,10 @@ func UnmarshalPublicKeyFromBigInt(b [4]*big.Int) (*PublicKey, error) {
 
 	var pubKeyBuf []byte
 
-	pt1 := PadLeftOrTrim(b[1].Bytes(), size)
-	pt2 := PadLeftOrTrim(b[0].Bytes(), size)
-	pt3 := PadLeftOrTrim(b[3].Bytes(), size)
-	pt4 := PadLeftOrTrim(b[2].Bytes(), size)
+	pt1 := padLeftOrTrim(b[1].Bytes(), size)
+	pt2 := padLeftOrTrim(b[0].Bytes(), size)
+	pt3 := padLeftOrTrim(b[3].Bytes(), size)
+	pt4 := padLeftOrTrim(b[2].Bytes(), size)
 
 	pubKeyBuf = append(pubKeyBuf, pt1...)
 	pubKeyBuf = append(pubKeyBuf, pt2...)

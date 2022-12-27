@@ -12,7 +12,7 @@ type Signature struct {
 
 // Verify checks the BLS signature of the message against the public key of its signer
 func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
-	messagePoint, err := hashToG1(message)
+	messagePoint, err := HashToG1(message)
 	if err != nil {
 		return false
 	}

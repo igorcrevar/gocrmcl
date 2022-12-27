@@ -20,7 +20,7 @@ func (p *PrivateKey) PublicKey() *PublicKey {
 
 // Sign generates a signature of the given message
 func (p *PrivateKey) Sign(message []byte) (*Signature, error) {
-	messagePoint, err := hashToG1(message)
+	messagePoint, err := HashToG1(message)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,10 @@ func GenerateBlsKey() (*PrivateKey, error) {
 	}
 
 	p := new(Fr)
-	p.SetBigEndianMod(s.Bytes())
+
+	if err := p.SetLittleEndian(s.Bytes()); err != nil {
+		return nil, err
+	}
 
 	return &PrivateKey{p: p}, nil
 }
