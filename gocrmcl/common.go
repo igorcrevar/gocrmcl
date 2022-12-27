@@ -6,6 +6,8 @@ import (
 	"math/big"
 )
 
+const MapToModeSolidity = true
+
 var (
 	domain, _ = hex.DecodeString("508e30424791cb9a71683381558c3da1979b6fa423b2d6db1396b1d94d7c4a78")
 
@@ -31,6 +33,8 @@ var (
 			},
 		},
 	}
+
+	r2 = newFp(0xf32cfc5b538afa89, 0xb5e71911d44501fb, 0x47ab1eff0a417ff6, 0x06d89f71cab8351f)
 
 	qCoef []uint64
 )
