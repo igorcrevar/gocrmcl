@@ -41,20 +41,21 @@ func HashToG1(message []byte) (*G1, error) {
 			return nil, err
 		}
 
-		g1, g2 := new(G1), new(G1)
+		p0, p1 := new(G1), new(G1)
 		u0, u1 := hashRes[0], hashRes[1]
 
-		if err := MapToG1(g1, u0); err != nil {
+		if err := MapToG1(p0, u0); err != nil {
 			return nil, err
 		}
 
-		if err := MapToG1(g2, u1); err != nil {
+		if err := MapToG1(p1, u1); err != nil {
 			return nil, err
 		}
 
-		G1Add(g1, g2, g2)
+		G1Add(p0, p0, p1)
+		G1Normalize(p0, p0)
 
-		return g1, nil
+		return p0, nil
 	}
 
 	g1 := new(G1)
@@ -152,15 +153,11 @@ func fromBytes(in []byte) (*Fp, error) {
 		return nil, errors.New("input string should be equal 32 bytes")
 	}
 
-	fe := &Fp{}
+	fe := BytesToFp(in)
 
-	if err := fe.SetLittleEndian(in); err != nil {
-		return nil, err
-	}
+	FpMul(&fe, &fe, &r2)
 
-	FpMul(fe, fe, &r2)
-
-	return fe, nil
+	return &fe, nil
 }
 
 func from48Bytes(in []byte) (*Fp, error) {

@@ -1,8 +1,12 @@
 package gocrmcl
 
 import (
-	"crypto/rand"
 	"errors"
+)
+
+var (
+	errEmptyKeyMarshalling = errors.New("cannot marshal empty private key")
+	errPrivateKeyGenerator = errors.New("error generating private key")
 )
 
 type PrivateKey struct {
@@ -35,7 +39,7 @@ func (p *PrivateKey) Sign(message []byte) (*Signature, error) {
 // MarshalJSON marshal the key to bytes.
 func (p *PrivateKey) MarshalJSON() ([]byte, error) {
 	if p.p == nil {
-		return nil, errors.New("cannot marshal empty private key")
+		return nil, errEmptyKeyMarshalling
 	}
 
 	return p.p.Serialize(), nil
@@ -54,15 +58,10 @@ func UnmarshalPrivateKey(data []byte) (*PrivateKey, error) {
 
 // GenerateBlsKey creates a random private and its corresponding public keys
 func GenerateBlsKey() (*PrivateKey, error) {
-	s, err := rand.Int(rand.Reader, maxBigInt)
-	if err != nil {
-		return nil, err
-	}
-
 	p := new(Fr)
 
-	if err := p.SetLittleEndian(s.Bytes()); err != nil {
-		return nil, err
+	if !p.SetByCSPRNG() {
+		return nil, errPrivateKeyGenerator
 	}
 
 	return &PrivateKey{p: p}, nil

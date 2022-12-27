@@ -272,11 +272,8 @@ func (x *Fr) IsNegative() bool {
 }
 
 // SetByCSPRNG --
-func (x *Fr) SetByCSPRNG() {
-	err := C.mclBnFr_setByCSPRNG(x.getPointer())
-	if err != 0 {
-		panic("err mclBnFr_setByCSPRNG")
-	}
+func (x *Fr) SetByCSPRNG() bool {
+	return C.mclBnFr_setByCSPRNG(x.getPointer()) == 0
 }
 
 // SetHashOf --

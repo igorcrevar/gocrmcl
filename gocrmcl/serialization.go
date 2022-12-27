@@ -23,6 +23,7 @@ func G2ToBytes(p *G2) []byte {
 	a, b := padLeftOrTrim(bgs[0].Bytes(), 32), padLeftOrTrim(bgs[1].Bytes(), 32)
 	c, d := padLeftOrTrim(bgs[2].Bytes(), 32), padLeftOrTrim(bgs[3].Bytes(), 32)
 
+	// order of big ints is: 1, 0, 3, 2
 	res := make([]byte, len(a)+len(b)+len(c)+len(d))
 	copy(res, b)
 	copy(res[len(b):], a)
@@ -80,6 +81,12 @@ func BytesToBigInt4(bytes []byte) ([4]*big.Int, error) {
 
 func G1FromBigInt(p [2]*big.Int) (*G1, error) {
 	g1 := new(G1)
+
+	// zero or infinity
+	if p[0].BitLen() == 0 && p[1].BitLen() == 0 {
+		return G1Zero(g1), nil
+	}
+
 	str := fmt.Sprintf("1 %s %s", p[0].String(), p[1].String())
 
 	if err := g1.SetString(str, 10); err != nil {
@@ -91,6 +98,12 @@ func G1FromBigInt(p [2]*big.Int) (*G1, error) {
 
 func G2FromBigInt(p [4]*big.Int) (*G2, error) {
 	g2 := new(G2)
+
+	// zero or infinity
+	if p[0].BitLen() == 0 && p[1].BitLen() == 0 && p[2].BitLen() == 0 && p[3].BitLen() == 0 {
+		return G2Zero(g2), nil
+	}
+
 	str := fmt.Sprintf("1 %s %s %s %s", p[0], p[1], p[2], p[3]) // fmt.Sprintf("%x", p[0])
 
 	if err := g2.SetString(str, 10); err != nil {
@@ -98,6 +111,31 @@ func G2FromBigInt(p [4]*big.Int) (*G2, error) {
 	}
 
 	return g2, nil
+}
+
+func BytesToFp(in []byte) Fp {
+	const size = 32
+
+	l := len(in)
+	if l >= size {
+		l = size
+	}
+
+	padded := make([]byte, size)
+
+	copy(padded[size-l:], in[:])
+
+	component := [4]uint64{}
+
+	for i := 0; i < 4; i++ {
+		a := size - i*8
+		component[i] = uint64(padded[a-1]) | uint64(padded[a-2])<<8 |
+			uint64(padded[a-3])<<16 | uint64(padded[a-4])<<24 |
+			uint64(padded[a-5])<<32 | uint64(padded[a-6])<<40 |
+			uint64(padded[a-7])<<48 | uint64(padded[a-8])<<56
+	}
+
+	return newFp(component[0], component[1], component[2], component[3])
 }
 
 func reverse(s []byte) []byte {

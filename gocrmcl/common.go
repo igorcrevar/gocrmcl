@@ -38,8 +38,6 @@ var (
 
 	r2 = newFp(0xf32cfc5b538afa89, 0xb5e71911d44501fb, 0x47ab1eff0a417ff6, 0x06d89f71cab8351f)
 
-	zero = newFp(0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000)
-
 	qCoef []uint64
 )
 
@@ -62,4 +60,25 @@ func GetDomain() []byte {
 
 func GetCoef() []uint64 {
 	return qCoef
+}
+
+func G1Zero(g1 *G1) *G1 {
+	g1.X = newFp(0, 0, 0, 0)
+	g1.Z = newFp(0, 0, 0, 0)
+
+	FpAdd(&g1.Y, &g1.Y, &r1)
+
+	return g1
+}
+
+func G2Zero(g2 *G2) *G2 {
+	g2.X.D[0] = newFp(0, 0, 0, 0)
+	g2.X.D[1] = newFp(0, 0, 0, 0)
+	g2.Y.D[1] = newFp(0, 0, 0, 0)
+	g2.Z.D[0] = newFp(0, 0, 0, 0)
+	g2.Z.D[1] = newFp(0, 0, 0, 0)
+
+	FpAdd(&g2.Y.D[0], &g2.Y.D[0], &r1)
+
+	return g2
 }
