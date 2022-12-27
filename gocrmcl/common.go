@@ -34,7 +34,11 @@ var (
 		},
 	}
 
+	r1 = newFp(0xd35d438dc58f0d9d, 0x0a78eb28f5c70b3d, 0x666ea36f7879462c, 0x0e0a77c19a07df2f)
+
 	r2 = newFp(0xf32cfc5b538afa89, 0xb5e71911d44501fb, 0x47ab1eff0a417ff6, 0x06d89f71cab8351f)
+
+	zero = newFp(0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000)
 
 	qCoef []uint64
 )
@@ -42,6 +46,10 @@ var (
 func init() {
 	if err := InitCurve(CurveSNARK1); err != nil {
 		panic(fmt.Errorf("snark1 curve initialization error: %w", err))
+	}
+
+	if err := SetMapToMode(0); err != nil {
+		panic(fmt.Errorf("snark1 curve map to mode: %w", err))
 	}
 
 	qCoef = PrecomputeG2(ellipticCurveG2)

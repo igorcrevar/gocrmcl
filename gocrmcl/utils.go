@@ -30,12 +30,7 @@ func MarshalMessageToBigInt(message []byte) ([2]*big.Int, error) {
 		return [2]*big.Int{}, err
 	}
 
-	buf := g1.SerializeUncompressed()
-
-	return [2]*big.Int{
-		new(big.Int).SetBytes(buf[0:32]),
-		new(big.Int).SetBytes(buf[32:64]),
-	}, nil
+	return G1ToBigInt(g1), nil
 }
 
 // Converts message to G1 point
@@ -79,22 +74,6 @@ func collectPublicKeys(keys []*PrivateKey) []*PublicKey {
 	}
 
 	return pubKeys
-}
-
-func padLeftOrTrim(bb []byte, size int) []byte {
-	l := len(bb)
-	if l == size {
-		return bb
-	}
-
-	if l > size {
-		return bb[l-size:]
-	}
-
-	tmp := make([]byte, size)
-	copy(tmp[size-l:], bb)
-
-	return tmp
 }
 
 func hashToFpXMDSHA256(msg []byte, domain []byte, count int) ([]*Fp, error) {

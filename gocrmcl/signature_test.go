@@ -47,8 +47,8 @@ func Test_AggregatedSignatureSimple(t *testing.T) {
 
 	verified := sig1.Aggregate(sig2).
 		Aggregate(sig3).Aggregate(&Signature{}).
-		Verify(bls1.PublicKey().aggregate(bls2.PublicKey()).
-			aggregate(bls3.PublicKey()).aggregate(&PublicKey{}), validTestMsg)
+		Verify((&PublicKey{}).aggregate(bls1.PublicKey().aggregate(bls2.PublicKey()).
+			aggregate(bls3.PublicKey()).aggregate(&PublicKey{})), validTestMsg)
 	assert.True(t, verified)
 
 	notVerified := sig1.Aggregate(sig2).

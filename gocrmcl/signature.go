@@ -24,6 +24,7 @@ func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
 	MillerLoop(e2, messagePoint, publicKey.p)
 	GTMul(e1, e1, e2)
 	FinalExp(e1, e1)
+
 	return e1.IsOne()
 }
 
@@ -57,7 +58,7 @@ func (s *Signature) Marshal() ([]byte, error) {
 		return nil, errors.New("cannot marshal empty signature")
 	}
 
-	return s.p.SerializeUncompressed(), nil
+	return G1ToBytes(s.p), nil
 }
 
 // UnmarshalSignature reads the signature from the given byte array
@@ -66,9 +67,13 @@ func UnmarshalSignature(raw []byte) (*Signature, error) {
 		return nil, errors.New("cannot unmarshal signature from empty slice")
 	}
 
-	g1 := new(G1)
+	bigInts, err := BytesToBigInt2(raw)
+	if err != nil {
+		return nil, err
+	}
 
-	if err := g1.DeserializeUncompressed(raw); err != nil {
+	g1, err := G1FromBigInt(bigInts)
+	if err != nil {
 		return nil, err
 	}
 
@@ -77,17 +82,7 @@ func UnmarshalSignature(raw []byte) (*Signature, error) {
 
 // ToBigInt marshalls signature (which is point) to 2 big ints - one for each coordinate
 func (s Signature) ToBigInt() ([2]*big.Int, error) {
-	sig, err := s.Marshal()
-	if err != nil {
-		return [2]*big.Int{}, err
-	}
-
-	res := [2]*big.Int{
-		new(big.Int).SetBytes(sig[0:32]),
-		new(big.Int).SetBytes(sig[32:64]),
-	}
-
-	return res, nil
+	return G1ToBigInt(s.p), nil
 }
 
 // Signatures is a slice of signatures
