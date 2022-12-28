@@ -1,0 +1,27 @@
+name: Go package
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18.x
+
+      - name: BuildMCL
+        run: make -j4  -C ./mcl
+        
+      - name: Build
+        run: go build -v ./gocrmcl/...
+
+      - name: Test
+        run: go test -v ./gocrmcl/...
