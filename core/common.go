@@ -1,17 +1,12 @@
-package gocrmcl
+package core
 
 import (
 	"encoding/hex"
 	"fmt"
-	"math/big"
 )
-
-const MapToModeSolidity = true
 
 var (
 	domain, _ = hex.DecodeString("508e30424791cb9a71683381558c3da1979b6fa423b2d6db1396b1d94d7c4a78")
-
-	maxBigInt, _ = new(big.Int).SetString("30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001", 16)
 
 	ellipticCurveG2 = &G2{
 		X: Fp2{
@@ -39,6 +34,8 @@ var (
 	r2 = newFp(0xf32cfc5b538afa89, 0xb5e71911d44501fb, 0x47ab1eff0a417ff6, 0x06d89f71cab8351f)
 
 	qCoef []uint64
+
+	HashToG1 func([]byte) (*G1, error)
 )
 
 func init() {
@@ -51,6 +48,12 @@ func init() {
 	}
 
 	qCoef = PrecomputeG2(ellipticCurveG2)
+
+	HashToG1 = HashToG107
+}
+
+func SetDomain(_domain []byte) {
+	domain = _domain
 }
 
 // Returns bls/bn254 domain

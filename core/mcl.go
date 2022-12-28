@@ -1,4 +1,4 @@
-package gocrmcl
+package core
 
 /*
 #cgo CFLAGS:-DMCLBN_FP_UNIT_SIZE=4 -I${SRCDIR}/../mcl/include

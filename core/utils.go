@@ -1,4 +1,4 @@
-package gocrmcl
+package core
 
 import (
 	"crypto/sha256"
@@ -33,8 +33,8 @@ func MarshalMessageToBigInt(message []byte) ([2]*big.Int, error) {
 	return G1ToBigInt(g1), nil
 }
 
-// HashToG1 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-03
-func HashToG1Native(message []byte) (*G1, error) {
+// HashToG103 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-03
+func HashToG103(message []byte) (*G1, error) {
 	g1 := new(G1)
 	if err := g1.HashAndMapTo(message); err != nil {
 		return nil, err
@@ -43,8 +43,8 @@ func HashToG1Native(message []byte) (*G1, error) {
 	return g1, nil
 }
 
-// HashToG1 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-07
-func HashToG1(message []byte) (*G1, error) {
+// HashToG107 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-07
+func HashToG107(message []byte) (*G1, error) {
 	hashRes, err := hashToFpXMDSHA256(message, GetDomain(), 2)
 	if err != nil {
 		return nil, err
