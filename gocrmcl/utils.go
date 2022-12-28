@@ -6,7 +6,7 @@ import (
 	"math/big"
 )
 
-// CreateRandomBlsKeys creates an array of random private and their corresponding public keys
+// CreateRandomBlsKeys creates an slice of random private keys
 func CreateRandomBlsKeys(total int) ([]*PrivateKey, error) {
 	blsKeys := make([]*PrivateKey, total)
 
@@ -33,31 +33,8 @@ func MarshalMessageToBigInt(message []byte) ([2]*big.Int, error) {
 	return G1ToBigInt(g1), nil
 }
 
-// Converts message to G1 point
-func HashToG1(message []byte) (*G1, error) {
-	if MapToModeSolidity {
-		hashRes, err := hashToFpXMDSHA256(message, GetDomain(), 2)
-		if err != nil {
-			return nil, err
-		}
-
-		p0, p1 := new(G1), new(G1)
-		u0, u1 := hashRes[0], hashRes[1]
-
-		if err := MapToG1(p0, u0); err != nil {
-			return nil, err
-		}
-
-		if err := MapToG1(p1, u1); err != nil {
-			return nil, err
-		}
-
-		G1Add(p0, p0, p1)
-		G1Normalize(p0, p0)
-
-		return p0, nil
-	}
-
+// HashToG1 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-03
+func HashToG1Native(message []byte) (*G1, error) {
 	g1 := new(G1)
 	if err := g1.HashAndMapTo(message); err != nil {
 		return nil, err
@@ -66,15 +43,28 @@ func HashToG1(message []byte) (*G1, error) {
 	return g1, nil
 }
 
-// colects public keys from the BlsKeys
-func collectPublicKeys(keys []*PrivateKey) []*PublicKey {
-	pubKeys := make([]*PublicKey, len(keys))
-
-	for i, key := range keys {
-		pubKeys[i] = key.PublicKey()
+// HashToG1 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-07
+func HashToG1(message []byte) (*G1, error) {
+	hashRes, err := hashToFpXMDSHA256(message, GetDomain(), 2)
+	if err != nil {
+		return nil, err
 	}
 
-	return pubKeys
+	p0, p1 := new(G1), new(G1)
+	u0, u1 := hashRes[0], hashRes[1]
+
+	if err := MapToG1(p0, u0); err != nil {
+		return nil, err
+	}
+
+	if err := MapToG1(p1, u1); err != nil {
+		return nil, err
+	}
+
+	G1Add(p0, p0, p1)
+	G1Normalize(p0, p0)
+
+	return p0, nil
 }
 
 func hashToFpXMDSHA256(msg []byte, domain []byte, count int) ([]*Fp, error) {

@@ -29,10 +29,8 @@ func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
 }
 
 // VerifyAggregated checks the BLS signature of the message against the aggregated public keys of its signers
-func (s *Signature) VerifyAggregated(publicKeys []*PublicKey, msg []byte) bool {
-	aggPubs := aggregatePublicKeys(publicKeys)
-
-	return s.Verify(aggPubs, msg)
+func (s *Signature) VerifyAggregated(publicKeys PublicKeys, msg []byte) bool {
+	return s.Verify(publicKeys.Aggregate(), msg)
 }
 
 // Aggregate adds the given signatures

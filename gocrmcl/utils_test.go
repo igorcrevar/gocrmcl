@@ -36,7 +36,7 @@ func Test_AggregatedSign(t *testing.T) {
 	keys, err := CreateRandomBlsKeys(participantsNumber) // create keys for validators
 	require.NoError(t, err)
 
-	pubKeys := collectPublicKeys(keys)
+	pubKeys := CollectPublicKeys(keys)
 
 	var isOk bool
 

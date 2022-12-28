@@ -47,13 +47,13 @@ func Test_AggregatedSignatureSimple(t *testing.T) {
 
 	verified := sig1.Aggregate(sig2).
 		Aggregate(sig3).Aggregate(&Signature{}).
-		Verify((&PublicKey{}).aggregate(bls1.PublicKey().aggregate(bls2.PublicKey()).
-			aggregate(bls3.PublicKey()).aggregate(&PublicKey{})), validTestMsg)
+		Verify((&PublicKey{}).Aggregate(bls1.PublicKey().Aggregate(bls2.PublicKey()).
+			Aggregate(bls3.PublicKey()).Aggregate(&PublicKey{})), validTestMsg)
 	assert.True(t, verified)
 
 	notVerified := sig1.Aggregate(sig2).
 		Aggregate(sig3).
-		Verify(bls1.PublicKey().aggregate(bls2.PublicKey()).aggregate(bls3.PublicKey()), invalidTestMsg)
+		Verify(bls1.PublicKey().Aggregate(bls2.PublicKey()).Aggregate(bls3.PublicKey()), invalidTestMsg)
 	assert.False(t, notVerified)
 }
 
@@ -65,8 +65,8 @@ func Test_AggregatedSignature(t *testing.T) {
 	blsKeys, err := CreateRandomBlsKeys(participantsNumber)
 	require.NoError(t, err)
 
-	allPubs := collectPublicKeys(blsKeys)
-	aggPubs := aggregatePublicKeys(allPubs)
+	allPubs := CollectPublicKeys(blsKeys)
+	aggPubs := allPubs.Aggregate()
 	allSignatures := Signatures{}
 
 	var manuallyAggSignature *Signature
@@ -91,7 +91,7 @@ func Test_AggregatedSignature(t *testing.T) {
 		if i == 0 {
 			manuallyAggPubs = pubKey
 		} else {
-			manuallyAggPubs = manuallyAggPubs.aggregate(pubKey)
+			manuallyAggPubs = manuallyAggPubs.Aggregate(pubKey)
 		}
 	}
 
