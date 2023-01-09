@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	domain, _ = hex.DecodeString("508e30424791cb9a71683381558c3da1979b6fa423b2d6db1396b1d94d7c4a78")
+	domain, _ = hex.DecodeString("608e30424791cb9a71683381558c3da1979b6fa423b2d6db1396b1d94d7c4a78")
 
 	ellipticCurveG2 = &G2{
 		X: Fp2{
@@ -63,6 +63,14 @@ func GetDomain() []byte {
 
 func GetCoef() []uint64 {
 	return qCoef
+}
+
+func GetR1() Fp {
+	return r1
+}
+
+func GetR2() Fp {
+	return r2
 }
 
 func G1Zero(g1 *G1) *G1 {

@@ -38,10 +38,11 @@ func Test_AggregatedSign(t *testing.T) {
 
 	pubKeys := CollectPublicKeys(keys)
 
-	var isOk bool
-
-	signatures := Signatures{}
-	aggSignature := new(Signature)
+	var (
+		signatures   []*Signature
+		isOk         bool
+		aggSignature = &Signature{}
+	)
 
 	// test all signatures at once
 	for i := 0; i < len(keys); i++ {
@@ -60,7 +61,7 @@ func Test_AggregatedSign(t *testing.T) {
 		assert.False(t, isOk)
 
 		// verify correctness of AggregateSignature
-		aggSig := (signatures[:i+1]).Aggregate()
+		aggSig := AggregateSignatures(signatures)
 
 		isOk = aggSig.VerifyAggregated(pubKeys[:i+1], validTestMsg)
 		assert.True(t, isOk)
@@ -71,9 +72,8 @@ func Test_AggregatedSign(t *testing.T) {
 }
 
 func Test_MarshalMessageToBigInt(t *testing.T) {
-	bigInts, err := MarshalMessageToBigInt([]byte("test test tes"))
+	bytes, err := MarshalMessage([]byte("test test tes"))
 
 	require.NoError(t, err)
-	assert.NotNil(t, bigInts[0])
-	assert.NotNil(t, bigInts[1])
+	assert.Len(t, bytes, 64)
 }

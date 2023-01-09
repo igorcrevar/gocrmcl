@@ -17,9 +17,6 @@ jobs:
         with:
           go-version: 1.18.x
 
-      - name: BuildMCL
-        run: make -j4  -C ./mcl
-        
       - name: Build
         run: go build -v ./core/...
 

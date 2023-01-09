@@ -2,8 +2,7 @@ package core
 
 import (
 	"encoding/json"
-	"errors"
-	"math/big"
+	"fmt"
 )
 
 // PublicKey represents bls public key
@@ -42,20 +41,23 @@ func (p *PublicKey) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p.Marshal())
 }
 
+func (p PublicKey) String() string {
+	return fmt.Sprintf("(%s %s, %s %s, %s %s)",
+		p.p.X.D[0].GetString(16), p.p.X.D[1].GetString(16),
+		p.p.Y.D[0].GetString(16), p.p.Y.D[1].GetString(16),
+		p.p.Z.D[0].GetString(16), p.p.Z.D[1].GetString(16))
+}
+
 // UnmarshalJSON implements the json.Marshaler interface.
 func (p *PublicKey) UnmarshalJSON(raw []byte) error {
 	var jsonBytes []byte
+	var err error
 
-	if err := json.Unmarshal(raw, &jsonBytes); err != nil {
+	if err = json.Unmarshal(raw, &jsonBytes); err != nil {
 		return err
 	}
 
-	bigInts, err := BytesToBigInt4(jsonBytes)
-	if err != nil {
-		return err
-	}
-
-	p.p, err = G2FromBigInt(bigInts)
+	p.p, err = G2FromBytes(jsonBytes)
 	if err != nil {
 		return err
 	}
@@ -65,44 +67,17 @@ func (p *PublicKey) UnmarshalJSON(raw []byte) error {
 
 // UnmarshalPublicKey reads the public key from the given byte array
 func UnmarshalPublicKey(raw []byte) (*PublicKey, error) {
-	if len(raw) == 0 {
-		return nil, errors.New("cannot unmarshal public key from empty slice")
-	}
-
-	bigInts, err := BytesToBigInt4(raw)
-	if err != nil {
-		return nil, err
-	}
-
-	g2, err := G2FromBigInt(bigInts)
+	g2, err := G2FromBytes(raw)
 	if err != nil {
 		return nil, err
 	}
 
 	return &PublicKey{p: g2}, nil
 }
-
-// ToBigInt converts public key to 4 big ints
-func (p PublicKey) ToBigInt() [4]*big.Int {
-	return G2ToBigInt(p.p)
-}
-
-// UnmarshalPublicKeyFromBigInt unmarshals public key from 4 big ints
-// Order of coordinates is [A.Y, A.X, B.Y, B.X]
-func UnmarshalPublicKeyFromBigInt(b [4]*big.Int) (*PublicKey, error) {
-	g2, err := G2FromBigInt(b)
-	if err != nil {
-		return nil, err
-	}
-
-	return &PublicKey{p: g2}, nil
-}
-
-type PublicKeys []*PublicKey
 
 // CollectPublicKeys colects public keys from slice of private keys
-func CollectPublicKeys(keys []*PrivateKey) PublicKeys {
-	pubKeys := make(PublicKeys, len(keys))
+func CollectPublicKeys(keys []*PrivateKey) []*PublicKey {
+	pubKeys := make([]*PublicKey, len(keys))
 
 	for i, key := range keys {
 		pubKeys[i] = key.PublicKey()
@@ -112,10 +87,10 @@ func CollectPublicKeys(keys []*PrivateKey) PublicKeys {
 }
 
 // AggregatePublicKeys calculates P1 + P2 + ...
-func (pks PublicKeys) Aggregate() *PublicKey {
+func AggregatePublicKeys(pubs []*PublicKey) *PublicKey {
 	newp := new(G2)
 
-	for _, x := range pks {
+	for _, x := range pubs {
 		if x.p != nil {
 			G2Add(newp, newp, x.p)
 		}

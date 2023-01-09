@@ -2,7 +2,7 @@ package core
 
 import (
 	"errors"
-	"math/big"
+	"fmt"
 )
 
 // Signature represents bls signature which is point on the curve
@@ -29,8 +29,8 @@ func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
 }
 
 // VerifyAggregated checks the BLS signature of the message against the aggregated public keys of its signers
-func (s *Signature) VerifyAggregated(publicKeys PublicKeys, msg []byte) bool {
-	return s.Verify(publicKeys.Aggregate(), msg)
+func (s *Signature) VerifyAggregated(publicKeys []*PublicKey, msg []byte) bool {
+	return s.Verify(AggregatePublicKeys(publicKeys), msg)
 }
 
 // Aggregate adds the given signatures
@@ -59,18 +59,14 @@ func (s *Signature) Marshal() ([]byte, error) {
 	return G1ToBytes(s.p), nil
 }
 
+func (s Signature) String() string {
+	return fmt.Sprintf("(%s, %s, %s)",
+		s.p.X.GetString(16), s.p.Y.GetString(16), s.p.Z.GetString(16))
+}
+
 // UnmarshalSignature reads the signature from the given byte array
 func UnmarshalSignature(raw []byte) (*Signature, error) {
-	if len(raw) == 0 {
-		return nil, errors.New("cannot unmarshal signature from empty slice")
-	}
-
-	bigInts, err := BytesToBigInt2(raw)
-	if err != nil {
-		return nil, err
-	}
-
-	g1, err := G1FromBigInt(bigInts)
+	g1, err := G1FromBytes(raw)
 	if err != nil {
 		return nil, err
 	}
@@ -78,19 +74,11 @@ func UnmarshalSignature(raw []byte) (*Signature, error) {
 	return &Signature{p: g1}, nil
 }
 
-// ToBigInt marshalls signature (which is point) to 2 big ints - one for each coordinate
-func (s Signature) ToBigInt() ([2]*big.Int, error) {
-	return G1ToBigInt(s.p), nil
-}
-
-// Signatures is a slice of signatures
-type Signatures []*Signature
-
 // Aggregate sums the given array of signatures
-func (s Signatures) Aggregate() *Signature {
+func AggregateSignatures(signatures []*Signature) *Signature {
 	newp := new(G1)
 
-	for _, x := range s {
+	for _, x := range signatures {
 		if x.p != nil {
 			G1Add(newp, newp, x.p)
 		}
